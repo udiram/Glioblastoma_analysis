@@ -133,8 +133,12 @@ venv.bak/
 .spyproject
 
 #tensoflow dependencies
-*pyd
+*.pyd
 
+# model weights and configurations
+*.h5
+*.hdf5
+*.keras
 # Rope project settings
 .ropeproject
 
