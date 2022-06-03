@@ -139,6 +139,9 @@ venv.bak/
 *.h5
 *.hdf5
 *.keras
+
+#large files/pictures with meta-data
+*.svs
 # Rope project settings
 .ropeproject
 
