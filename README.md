@@ -17,9 +17,10 @@ Project to use slide images of recessed tumours in training of deep learning alg
  
 
 
-## Support
+## contact
 
 For support, email ramu@mcmaster.ca
+For more info visit https://sites.google.com/view/udbhav-ram
 
 
 ## Acknowledgements
