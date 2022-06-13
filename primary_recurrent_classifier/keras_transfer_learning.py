@@ -1,12 +1,12 @@
 from keras import applications
-from keras.preprocessing.image import ImageDataGenerator
 from keras import optimizers
-from keras.models import Sequential
 from keras.layers import Dropout, Flatten, Dense
+from keras.models import Sequential
+from keras.preprocessing.image import ImageDataGenerator
 
 # path to the model weights files.
 weights_path = '../data/vgg16_weights.h5'
-top_model_weights_path = 'first_try.h5'
+top_model_weights_path = 'models/first_try.h5'
 # dimensions of our images.
 img_width, img_height = 150, 150
 

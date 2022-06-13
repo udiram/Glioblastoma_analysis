@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from PIL import Image, ImageDraw
 
 image = cv2.imread('../data/uab_data/keras/primary/1_N.jpg')
 
@@ -24,6 +23,15 @@ print('Image Height       : ', height)
 print('Image Width        : ', width)
 print('Number of Channels : ', channels)
 
+# get (i, j) positions of all RGB pixels that are black (i.e. [0, 0, 0])
+black_pixels = np.where(
+    (dst[:, :, 0] == 0) &
+    (dst[:, :, 1] == 0) &
+    (dst[:, :, 2] == 0)
+)
+
+# set those pixels to white
+dst[black_pixels] = [255, 255, 255]
 
 cv2.circle(image, (int(width/2), int(height/2)), int(height/2), (0,0,255), 2)
 cv2.rectangle(image,(0,0), (width, height), (0,255,0), 5)
