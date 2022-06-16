@@ -1,18 +1,17 @@
-from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
 from keras import backend as K
-from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
-
+from keras.callbacks import TensorBoard
+from keras.layers import Activation, Dropout, Flatten, Dense
+from keras.layers import Conv2D, MaxPooling2D
+from keras.models import Sequential
+from keras.preprocessing.image import ImageDataGenerator
 
 # dimensions of our images.
 img_width, img_height = 150, 150
 
-train_data_dir = '../data/keras_training/train'
-validation_data_dir = '../data/keras_training/validation'
-nb_train_samples = 254
-nb_validation_samples = 80
+train_data_dir = '../data/rect_train_V3_balanced/training'
+validation_data_dir = '../data/rect_train_V3_balanced/validation'
+nb_train_samples = 120
+nb_validation_samples = 14
 epochs = 100
 batch_size = 16
 
