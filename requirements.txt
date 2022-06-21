@@ -36,7 +36,7 @@ fastjsonschema==2.15.3
 flatbuffers==1.12
 fonttools==4.33.3
 gast==0.4.0
-google-auth==2.6.6
+google-auth==2.8.0
 google-auth-oauthlib==0.4.6
 google-pasta==0.2.0
 grapheme==0.6.0
