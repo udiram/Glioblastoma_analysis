@@ -7,7 +7,7 @@ matplotlib
 torch
 grad_cam
 torchcam
-about-time==3.3.0
+about-time==3.1.1
 absl-py==1.1.0
 alive-progress==2.4.1
 argon2-cffi==21.3.0
