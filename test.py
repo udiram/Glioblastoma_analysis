@@ -46,5 +46,6 @@ it = ImageTransformer(feature_extractor=tsne,
 X_train_img = it.fit_transform(X_train_norm)
 X_train_imgR = it.fit_transform(X_train_normR)
 xcombined = np.concatenate((X_train_img, X_train_imgR), axis=0)
+print(xcombined.shape)
 
 # x training = xcombined  X structured = X_trianAffRNAS  y = Y_trainAffRNA
