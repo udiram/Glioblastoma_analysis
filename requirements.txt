@@ -34,7 +34,7 @@ entrypoints==0.4
 executing==0.10.0
 fastjsonschema==2.16.1
 flatbuffers==2.0
-fonttools==4.34.4
+fonttools==4.35.0
 gast==0.5.3
 google-auth==2.10.0
 google-auth-oauthlib==0.5.2
