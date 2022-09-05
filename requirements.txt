@@ -88,7 +88,7 @@ parso==0.8.3
 pickleshare==0.7.5
 Pillow==9.2.0
 prometheus-client==0.14.1
-prompt-toolkit==3.0.30
+prompt-toolkit==3.0.31
 protobuf
 psutil==5.9.1
 pure-eval==0.2.2
