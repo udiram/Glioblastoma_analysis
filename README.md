@@ -1,5 +1,5 @@
 
-# Project Title
+# Analysis of Glioblastoma Whole Slide Images using deep learning computer vision methods
 
 Project to use slide images of recessed tumours in training of deep learning algorithms to identify methylation, primary or recurrence among other qualities
 
@@ -15,7 +15,6 @@ Project to use slide images of recessed tumours in training of deep learning alg
 
 **Client:** CUDA enabled Nvidia GPU (can be modified to accomodate other setups)
  
-
 
 ## contact
 
