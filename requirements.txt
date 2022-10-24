@@ -77,7 +77,7 @@ nest-asyncio==1.5.5
 networkx==2.8.7
 notebook==6.5.1
 numpy==1.23.3
-oauthlib==3.2.1
+oauthlib==3.2.2
 opencv-python==4.6.0.66
 opt-einsum==3.3.0
 outcome==1.2.0
