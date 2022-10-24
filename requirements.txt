@@ -8,7 +8,7 @@ torch
 grad_cam
 torchcam
 about-time
-absl-py==1.2.0
+absl-py==1.3.0
 alive-progress==2.4.1
 argon2-cffi==21.3.0
 argon2-cffi-bindings==21.2.0
