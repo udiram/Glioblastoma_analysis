@@ -98,7 +98,7 @@ pycparser==2.21
 Pygments==2.13.0
 pyOpenSSL==22.0.0
 pyparsing==3.0.9
-pyrsistent==0.18.1
+pyrsistent==0.19.2
 PySocks==1.7.1
 python-dateutil==2.8.2
 python-dotenv==0.21.0
