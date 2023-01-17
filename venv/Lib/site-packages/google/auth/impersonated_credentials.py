@@ -100,7 +100,7 @@ def _make_iam_token_request(
     )
 
     if response.status != http_client.OK:
-        exceptions.RefreshError(_REFRESH_ERROR, response_body)
+        raise exceptions.RefreshError(_REFRESH_ERROR, response_body)
 
     try:
         token_response = json.loads(response_body)
@@ -232,7 +232,7 @@ class Credentials(
         self._target_principal = target_principal
         self._target_scopes = target_scopes
         self._delegates = delegates
-        self._lifetime = lifetime
+        self._lifetime = lifetime or _DEFAULT_TOKEN_LIFETIME_SECS
         self.token = None
         self.expiry = _helpers.utcnow()
         self._quota_project_id = quota_project_id
@@ -288,9 +288,12 @@ class Credentials(
 
         authed_session = AuthorizedSession(self._source_credentials)
 
-        response = authed_session.post(
-            url=iam_sign_endpoint, headers=headers, json=body
-        )
+        try:
+            response = authed_session.post(
+                url=iam_sign_endpoint, headers=headers, json=body
+            )
+        finally:
+            authed_session.close()
 
         if response.status_code != http_client.OK:
             raise exceptions.TransportError(
@@ -374,7 +377,7 @@ class IDTokenCredentials(credentials.CredentialsWithQuotaProject):
 
     def from_credentials(self, target_credentials, target_audience=None):
         return self.__class__(
-            target_credentials=self._target_credentials,
+            target_credentials=target_credentials,
             target_audience=target_audience,
             include_email=self._include_email,
             quota_project_id=self._quota_project_id,

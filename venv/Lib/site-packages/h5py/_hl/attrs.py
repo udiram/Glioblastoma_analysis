@@ -73,7 +73,7 @@ class AttributeManager(base.MutableMappingHDF5, base.CommonStateObject):
             shape = attr.shape + subshape   # (5, 3)
             dtype = subdtype                # 'f'
 
-        arr = numpy.ndarray(shape, dtype=dtype, order='C')
+        arr = numpy.zeros(shape, dtype=dtype, order='C')
         attr.read(arr, mtype=htype)
 
         string_info = h5t.check_string_dtype(dtype)
@@ -190,27 +190,31 @@ class AttributeManager(base.MutableMappingHDF5, base.CommonStateObject):
 
             # This mess exists because you can't overwrite attributes in HDF5.
             # So we write to a temporary attribute first, and then rename.
-
-            tempname = uuid.uuid4().hex
+            # see issue 1385
+            # if track_order is enabled new attributes (which exceed the
+            # max_compact range, 8 is default) cannot be created as temporary
+            # attributes with subsequent rename, doing that would trigger
+            # the error discussed in the above issue
+            attr_exists = False
+            if h5a.exists(self._id, self._e(name)):
+                attr_exists = True
+                tempname = uuid.uuid4().hex
+            else:
+                tempname = name
 
             attr = h5a.create(self._id, self._e(tempname), htype, space)
             try:
                 if not isinstance(data, Empty):
                     attr.write(data, mtype=htype2)
+                if attr_exists:
+                    # Rename temp attribute to proper name
+                    # No atomic rename in HDF5 :(
+                    h5a.delete(self._id, self._e(name))
+                    h5a.rename(self._id, self._e(tempname), self._e(name))
             except:
                 attr.close()
                 h5a.delete(self._id, self._e(tempname))
                 raise
-            else:
-                try:
-                    # No atomic rename in HDF5 :(
-                    if h5a.exists(self._id, self._e(name)):
-                        h5a.delete(self._id, self._e(name))
-                    h5a.rename(self._id, self._e(tempname), self._e(name))
-                except:
-                    attr.close()
-                    h5a.delete(self._id, self._e(tempname))
-                    raise
             finally:
                 attr.close()
 

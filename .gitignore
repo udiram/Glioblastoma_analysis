@@ -172,3 +172,6 @@ cython_debug/
 *.tif
 *.jpg
 *.jpeg
+*.pb
+*.data-00000-of-00001
+*.data-00000-of-00001

@@ -11,10 +11,6 @@
     Implements support for high-level dataset access.
 """
 
-try:
-    from functools import cached_property
-except ImportError:
-    from cached_property import cached_property
 import posixpath as pp
 import sys
 from warnings import warn
@@ -25,7 +21,7 @@ import numpy
 
 from .. import h5, h5s, h5t, h5r, h5d, h5p, h5fd, h5ds, _selector
 from ..h5py_warnings import H5pyDeprecationWarning
-from .base import HLObject, phil, with_phil, Empty, find_item_type
+from .base import HLObject, phil, with_phil, Empty, cached_property, find_item_type
 from . import filters
 from . import selections as sel
 from . import selections2 as sel2
@@ -41,7 +37,8 @@ def make_new_dset(parent, shape=None, dtype=None, data=None, name=None,
                   chunks=None, compression=None, shuffle=None,
                   fletcher32=None, maxshape=None, compression_opts=None,
                   fillvalue=None, scaleoffset=None, track_times=False,
-                  external=None, track_order=None, dcpl=None,
+                  external=None, track_order=None, dcpl=None, dapl=None,
+                  efile_prefix=None, virtual_prefix=None,
                   allow_unknown_filter=False):
     """ Return a new low-level dataset identifier """
 
@@ -112,7 +109,15 @@ def make_new_dset(parent, shape=None, dtype=None, data=None, name=None,
         maxshape, scaleoffset, external, allow_unknown_filter)
 
     if fillvalue is not None:
-        fillvalue = numpy.array(fillvalue)
+        # prepare string-type dtypes for fillvalue
+        string_info = h5t.check_string_dtype(dtype)
+        if string_info is not None:
+            # fake vlen dtype for fixed len string fillvalue
+            # to not trigger unwanted encoding
+            dtype = h5t.string_dtype(string_info.encoding)
+            fillvalue = numpy.array(fillvalue, dtype=dtype)
+        else:
+            fillvalue = numpy.array(fillvalue)
         dcpl.set_fill_value(fillvalue)
 
     if track_times is None:
@@ -133,21 +138,47 @@ def make_new_dset(parent, shape=None, dtype=None, data=None, name=None,
     if maxshape is not None:
         maxshape = tuple(m if m is not None else h5s.UNLIMITED for m in maxshape)
 
+    if efile_prefix is not None or virtual_prefix is not None:
+        dapl = dapl or h5p.create(h5p.DATASET_ACCESS)
+
+    if efile_prefix is not None:
+        dapl.set_efile_prefix(efile_prefix)
+
+    if virtual_prefix is not None:
+        dapl.set_virtual_prefix(virtual_prefix)
+
     if isinstance(data, Empty):
         sid = h5s.create(h5s.NULL)
     else:
         sid = h5s.create_simple(shape, maxshape)
 
 
-    dset_id = h5d.create(parent.id, name, tid, sid, dcpl=dcpl)
+    dset_id = h5d.create(parent.id, name, tid, sid, dcpl=dcpl, dapl=dapl)
 
     if (data is not None) and (not isinstance(data, Empty)):
         dset_id.write(h5s.ALL, h5s.ALL, data)
 
     return dset_id
 
+def open_dset(parent, name, dapl=None, efile_prefix=None, virtual_prefix=None, **kwds):
+    """ Return an existing low-level dataset identifier """
 
-class AstypeWrapper(object):
+    if efile_prefix is not None or virtual_prefix is not None:
+        dapl = dapl or h5p.create(h5p.DATASET_ACCESS)
+    else:
+        dapl = dapl or None
+
+    if efile_prefix is not None:
+        dapl.set_efile_prefix(efile_prefix)
+
+    if virtual_prefix is not None:
+        dapl.set_virtual_prefix(virtual_prefix)
+
+    dset_id = h5d.open(parent.id, name, dapl=dapl)
+
+    return dset_id
+
+class AstypeWrapper:
     """Wrapper to convert data on reading from a dataset.
     """
     def __init__(self, dset, dtype):
@@ -249,7 +280,7 @@ def readtime_dtype(basetype, names):
 
 
 if MPI:
-    class CollectiveContext(object):
+    class CollectiveContext:
 
         """ Manages collective I/O in MPI mode """
 
@@ -267,7 +298,7 @@ if MPI:
             self._dset._dxpl.set_dxpl_mpio(h5fd.MPIO_INDEPENDENT)
 
 
-class ChunkIterator(object):
+class ChunkIterator:
     """
     Class to iterate through list of chunks of a given dataset
     """
@@ -565,7 +596,7 @@ class Dataset(HLObject):
     @with_phil
     def fillvalue(self):
         """Fill value for this dataset (0 by default)"""
-        arr = numpy.ndarray((1,), dtype=self.dtype)
+        arr = numpy.zeros((1,), dtype=self.dtype)
         self._dcpl.get_fill_value(arr)
         return arr[0]
 
@@ -586,7 +617,7 @@ class Dataset(HLObject):
         """
         if not isinstance(bind, h5d.DatasetID):
             raise ValueError("%s is not a DatasetID" % bind)
-        super(Dataset, self).__init__(bind)
+        super().__init__(bind)
 
         self._dcpl = self.id.get_create_plist()
         self._dxpl = h5p.create(h5p.DATASET_XFER)
@@ -745,7 +776,7 @@ class Dataset(HLObject):
             if mshape is None:
                 # 0D with no data (NULL or deselected SCALAR)
                 return Empty(new_dtype)
-            out = numpy.empty(mshape, dtype=new_dtype)
+            out = numpy.zeros(mshape, dtype=new_dtype)
             if out.size == 0:
                 return out
 
@@ -760,7 +791,7 @@ class Dataset(HLObject):
             # Check 'is Ellipsis' to avoid equality comparison with an array:
             # array equality returns an array, not a boolean.
             if args == () or (len(args) == 1 and args[0] is Ellipsis):
-                return numpy.empty(self.shape, dtype=new_dtype)
+                return numpy.zeros(self.shape, dtype=new_dtype)
 
         # === Scalar dataspaces =================
 
@@ -768,9 +799,9 @@ class Dataset(HLObject):
             fspace = self.id.get_space()
             selection = sel2.select_read(fspace, args)
             if selection.mshape is None:
-                arr = numpy.ndarray((), dtype=new_dtype)
+                arr = numpy.zeros((), dtype=new_dtype)
             else:
-                arr = numpy.ndarray(selection.mshape, dtype=new_dtype)
+                arr = numpy.zeros(selection.mshape, dtype=new_dtype)
             for mspace, fspace in selection:
                 self.id.read(mspace, fspace, arr, mtype)
             if selection.mshape is None:
@@ -783,9 +814,9 @@ class Dataset(HLObject):
         selection = sel.select(self.shape, args, dataset=self)
 
         if selection.nselect == 0:
-            return numpy.ndarray(selection.array_shape, dtype=new_dtype)
+            return numpy.zeros(selection.array_shape, dtype=new_dtype)
 
-        arr = numpy.ndarray(selection.array_shape, new_dtype, order='C')
+        arr = numpy.zeros(selection.array_shape, new_dtype, order='C')
 
         # Perform the actual read
         mspace = h5s.create_simple(selection.mshape)
@@ -1006,7 +1037,7 @@ class Dataset(HLObject):
         THIS MEANS DATASETS ARE INTERCHANGEABLE WITH ARRAYS.  For one thing,
         you have to read the whole dataset every time this method is called.
         """
-        arr = numpy.empty(self.shape, dtype=self.dtype if dtype is None else dtype)
+        arr = numpy.zeros(self.shape, dtype=self.dtype if dtype is None else dtype)
 
         # Special case for (0,)*-shape datasets
         if numpy.product(self.shape, dtype=numpy.ulonglong) == 0:

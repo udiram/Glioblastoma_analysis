@@ -37,7 +37,7 @@ class Group(HLObject, MutableMappingHDF5):
         with phil:
             if not isinstance(bind, h5g.GroupID):
                 raise ValueError("%s is not a GroupID" % bind)
-            super(Group, self).__init__(bind)
+            super().__init__(bind)
 
 
     _gcpl_crt_order = h5p.create(h5p.GROUP_CREATE)
@@ -130,6 +130,12 @@ class Group(HLObject, MutableMappingHDF5):
             Each name must be a str, bytes, or os.PathLike; each offset and
             size, an integer.  If only a name is given instead of an iterable
             of tuples, it is equivalent to [(name, 0, h5py.h5f.UNLIMITED)].
+        efile_prefix
+            (String) External dataset file prefix for dataset access property
+            list. Does not persist in the file.
+        virtual_prefix
+            (String) Virtual dataset file prefix for dataset access property
+            list. Does not persist in the file.
         allow_unknown_filter
             (T/F) Do not check that the requested filter is available for use.
             This should only be used with ``write_direct_chunk``, where the caller
@@ -137,6 +143,12 @@ class Group(HLObject, MutableMappingHDF5):
         """
         if 'track_order' not in kwds:
             kwds['track_order'] = h5.get_config().track_order
+
+        if 'efile_prefix' in kwds:
+            kwds['efile_prefix'] = self._e(kwds['efile_prefix'])
+
+        if 'virtual_prefix' in kwds:
+            kwds['virtual_prefix'] = self._e(kwds['virtual_prefix'])
 
         with phil:
             group = self
@@ -224,6 +236,12 @@ class Group(HLObject, MutableMappingHDF5):
         Raises TypeError if an incompatible object already exists, or if the
         shape or dtype don't match according to the above rules.
         """
+        if 'efile_prefix' in kwds:
+            kwds['efile_prefix'] = self._e(kwds['efile_prefix'])
+
+        if 'virtual_prefix' in kwds:
+            kwds['virtual_prefix'] = self._e(kwds['virtual_prefix'])
+
         with phil:
             if not name in self:
                 return self.create_dataset(name, *(shape, dtype), **kwds)
@@ -231,9 +249,14 @@ class Group(HLObject, MutableMappingHDF5):
             if isinstance(shape, int):
                 shape = (shape,)
 
-            dset = self[name]
-            if not isinstance(dset, dataset.Dataset):
+            try:
+                dsid = dataset.open_dset(self, self._e(name), **kwds)
+                dset = dataset.Dataset(dsid)
+            except KeyError:
+                dset = self[name]
                 raise TypeError("Incompatible object (%s) already exists" % dset.__class__.__name__)
+            except:
+                raise
 
             if not shape == dset.shape:
                 raise TypeError("Shapes do not match (existing %s vs new %s)" % (dset.shape, shape))
@@ -625,7 +648,7 @@ class Group(HLObject, MutableMappingHDF5):
         return r
 
 
-class HardLink(object):
+class HardLink:
 
     """
         Represents a hard link in an HDF5 file.  Provided only so that
@@ -635,7 +658,7 @@ class HardLink(object):
     pass
 
 
-class SoftLink(object):
+class SoftLink:
 
     """
         Represents a symbolic ("soft") link in an HDF5 file.  The path
@@ -655,7 +678,7 @@ class SoftLink(object):
         return '<SoftLink to "%s">' % self.path
 
 
-class ExternalLink(object):
+class ExternalLink:
 
     """
         Represents an HDF5 external link.  Paths may be absolute or relative.
