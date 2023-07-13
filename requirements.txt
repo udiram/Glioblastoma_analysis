@@ -82,7 +82,7 @@ opencv-python==4.8.0.74
 opt-einsum==3.3.0
 outcome==1.2.0
 packaging==23.1
-pandas==1.5.3
+pandas==2.0.3
 pandocfilters==1.5.0
 parso==0.8.3
 pickleshare==0.7.5
