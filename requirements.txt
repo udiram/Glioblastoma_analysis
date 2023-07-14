@@ -33,7 +33,7 @@ efficientnet==1.1.1
 entrypoints==0.4
 executing==1.2.0
 fastjsonschema==2.17.1
-flatbuffers==23.3.3
+flatbuffers==23.5.26
 fonttools==4.41.0
 gast==0.5.4
 google-auth==2.22.0
