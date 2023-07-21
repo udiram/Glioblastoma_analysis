@@ -105,7 +105,7 @@ python-dotenv==0.21.1
 pytz==2022.7.1
 PyWavelets==1.4.1
 pypiwin32
-pywinpty==2.0.10
+pywinpty==2.0.11
 pyzmq==24.0.1
 qtconsole==5.4.2
 QtPy==2.3.1
