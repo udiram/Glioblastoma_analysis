@@ -132,7 +132,7 @@ tensorflow-io-gcs-filesystem==0.32.0
 termcolor==2.3.0
 terminado==0.18.0
 threadpoolctl==3.1.0
-tifffile==2022.10.10
+tifffile==2024.1.30
 tinycss2==1.2.1
 tornado==6.3.3
 traitlets==5.9.0
