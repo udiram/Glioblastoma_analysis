@@ -83,7 +83,7 @@ opt-einsum==3.3.0
 outcome==1.2.0
 packaging==23.1
 pandas==1.5.3
-pandocfilters==1.5.0
+pandocfilters==1.5.1
 parso==0.8.3
 pickleshare==0.7.5
 Pillow==9.5.0
