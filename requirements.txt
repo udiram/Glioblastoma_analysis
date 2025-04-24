@@ -41,7 +41,7 @@ google-auth-oauthlib==0.8.0
 google-pasta==0.2.0
 grapheme==0.6.0
 grpcio==1.60.1
-h11==0.14.0
+h11==0.16.0
 h5py==3.10.0
 idna==3.7
 imageio==2.31.1
