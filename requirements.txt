@@ -43,7 +43,7 @@ grapheme==0.6.0
 grpcio==1.60.1
 h11==0.16.0
 h5py==3.10.0
-idna==3.7
+idna==3.10
 imageio==2.37.0
 importlib-metadata==6.8.0
 ipykernel==6.24.0
