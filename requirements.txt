@@ -68,7 +68,7 @@ libclang==15.0.6.1
 Markdown==3.5.2
 MarkupSafe==2.1.2
 matplotlib==3.9.4
-matplotlib-inline==0.1.6
+matplotlib-inline==0.1.7
 mistune
 nbclient==0.8.0
 nbconvert==7.16.6
