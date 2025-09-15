@@ -96,7 +96,7 @@ pyasn1==0.4.8
 pyasn1-modules==0.4.2
 pycparser==2.22
 Pygments==2.19.1
-pyOpenSSL==23.2.0
+pyOpenSSL==25.2.0
 pyparsing==3.2.3
 pyrsistent==0.20.0
 PySocks==1.7.1
