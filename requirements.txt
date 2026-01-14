@@ -140,7 +140,7 @@ trio==0.30.0
 trio-websocket==0.12.2
 typing_extensions==4.5.0
 urllib3==2.6.3
-wcwidth==0.2.13
+wcwidth==0.2.14
 webdriver-manager==3.8.6
 webencodings==0.5.1
 Werkzeug==3.1.5
