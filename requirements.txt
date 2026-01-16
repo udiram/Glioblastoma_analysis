@@ -90,7 +90,7 @@ Pillow==9.5.0
 prometheus-client==0.19.0
 prompt-toolkit==3.0.43
 protobuf
-psutil==5.9.6
+psutil==7.2.1
 pure-eval==0.2.2
 pyasn1==0.6.2
 pyasn1-modules==0.4.2
