@@ -87,7 +87,7 @@ pandocfilters==1.5.1
 parso==0.8.4
 pickleshare==0.7.5
 Pillow==12.3.0
-prometheus-client==0.25.0
+prometheus-client==0.26.0
 prompt-toolkit==3.0.43
 protobuf
 psutil==5.9.6
